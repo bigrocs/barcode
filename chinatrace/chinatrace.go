@@ -10,13 +10,13 @@ import (
 )
 
 var (
-	BASE_HOST string = "http://webapi.chinatrace.org/"
+	BASE_HOST string = "http://webapi.chinatrace.org"
 	KEY       string = "V7N3Xpm4jpRon/WsZ8X/63G8oMeGdUkA8Luxs1CenTY="
 )
 
 // GetURL 获取请网址
 func GetURL(code string) (url string, err error) {
-	url = "api/getProductData?productCode=" + code
+	url = "/api/getProductData?productCode=" + code
 	mac, err := GetMac(url)
 	if err != nil {
 		return url, err

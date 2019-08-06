@@ -6,7 +6,7 @@ import (
 )
 
 func TestAddGoods(t *testing.T) {
-	url, err := GetURL("6938166920785")
+	url, err := GetURL("06923450605288")
 	fmt.Println(url, err)
 	t.Log(t)
 }
