@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/bigrocs/barcode/drives"
 )
 
 func TestAddGoods(t *testing.T) {
-	data, err := GetURL("06923450605288")
+	chinatrace := &drives.Chinatrace{}
+	data, err := chinatrace.Get("6923450605288")
 	fmt.Println(data, err)
 	t.Log(t)
 }
