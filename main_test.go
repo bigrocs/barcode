@@ -9,7 +9,7 @@ import (
 
 func TestAddGoods(t *testing.T) {
 	chinatrace := &drives.Chinatrace{}
-	data, err := chinatrace.Get("6923450605288")
+	data, err := chinatrace.Get("6917878036526")
 	fmt.Println(data, err)
 	t.Log(t)
 }

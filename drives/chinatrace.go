@@ -8,10 +8,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/bigrocs/barcode/data"
+	"github.com/gomsa/tools/uitl"
 )
 
 var (
@@ -40,6 +42,10 @@ func (srv *Chinatrace) Get(code string) (goods *data.Goods, err error) {
 	if err != nil {
 		return goods, err
 	}
+	err = srv.getSubGoods(content, goods)
+	if err != nil {
+		return goods, err
+	}
 	return goods, err
 }
 
@@ -54,7 +60,90 @@ func (srv *Chinatrace) getURL(code string) (url string, err error) {
 	return url, err
 }
 
-// response 处理返回数据
+// getSubGoods 获取商品子属性
+func (srv *Chinatrace) getSubGoods(content map[string]interface{}, goods *data.Goods) (err error) {
+	content = content["d"].(map[string]interface{})
+	url := content["ItemDescription"].(string)
+	// 请求商品详情页面
+	headers := srv.Headers()
+	httpContent, err := srv.request(url, headers)
+	if err != nil {
+		return err
+	}
+	// 截取商品信息
+	html := uitl.ConvertToString(string(httpContent), "gbk", "utf8")
+	regex, err := regexp.Compile(`SetValue(.'(.*?)','(.*?)'.);`)
+	atts := regex.FindAllStringSubmatch(html, -1)
+	// 处理商品详情数据
+	srv.handerSubGoods(atts, goods)
+	return err
+}
+
+// handerSubGoods 处理商品详情数据
+func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err error) {
+	for _, varr := range atts {
+		switch varr[2] {
+		case `Att_Sys_en_us_141_G`:
+			goods.EnName = varr[3]
+		case `Att_Sys_zh-cn_101_G`:
+			goods.Width, _ = strconv.ParseInt(varr[3], 10, 64)
+		case `Att_Sys_zh-cn_104_G`:
+			switch varr[3] {
+			case `厘米`:
+				goods.Width = goods.Width * 10
+			case `米`:
+				goods.Width = goods.Width * 100
+			}
+		case `Att_Sys_zh-cn_106_G`:
+			goods.Height, _ = strconv.ParseInt(varr[3], 10, 64)
+		case `Att_Sys_zh-cn_326_G`:
+			switch varr[3] {
+			case `厘米`:
+				goods.Height = goods.Height * 10
+			case `米`:
+				goods.Height = goods.Height * 100
+			}
+		case `Att_Sys_zh-cn_118_G`:
+			goods.Depth, _ = strconv.ParseInt(varr[3], 10, 64)
+		case `Att_Sys_zh-cn_331_G`:
+			switch varr[3] {
+			case `厘米`:
+				goods.Depth = goods.Depth * 10
+			case `米`:
+				goods.Depth = goods.Depth * 100
+			}
+
+		case `Att_Sys_zh-cn_10_G`:
+			goods.NetWeight, _ = strconv.ParseInt(varr[3], 10, 64)
+		case `Att_Sys_zh-cn_189_G`:
+			switch varr[3] {
+			case `千克`:
+				goods.NetWeight = goods.NetWeight * 1000
+			}
+		case `Att_Sys_zh-cn_54_G`:
+			goods.GrossWeight, _ = strconv.ParseInt(varr[3], 10, 64)
+		case `Att_Sys_zh-cn_84_G`:
+			switch varr[3] {
+			case `千克`:
+				goods.GrossWeight = goods.GrossWeight * 1000
+			}
+		case `Att_Sys_zh-cn_22_G`:
+			regex, _ := regexp.Compile(`.*\((.*?)\)`)
+			atts := regex.FindAllStringSubmatch(varr[3], -1)
+			goods.UnspscName = atts[0][1]
+		case `Att_Sys_zh-cn_35_G`:
+			goods.Unit = varr[3]
+		case `Att_Sys_zh-cn_74_G`:
+			goods.Country = varr[3]
+		case `Att_Sys_zh-cn_405_G`:
+			goods.Place = varr[3]
+		}
+
+	}
+	return err
+}
+
+// handerGoods 处理商品数据
 func (srv *Chinatrace) handerGoods(content map[string]interface{}) (goods *data.Goods, err error) {
 	goods = &data.Goods{}
 	content = content["d"].(map[string]interface{})
@@ -77,13 +166,18 @@ func (srv *Chinatrace) handerGoods(content map[string]interface{}) (goods *data.
 
 // handerImage 处理返回图片
 func (srv *Chinatrace) handerImages(items interface{}) (images []string, err error) {
-	for _, item := range items.([]interface{}) {
-		// 转为 map 然后读取 Imageurl 然后转为 string
-		img := item.(map[string]interface{})["Imageurl"].(string)
-		if IMAGE_HOST != "" {
-			img = strings.Replace(img, "http://www.anccnet.com", IMAGE_HOST, -1)
+	// 防止没有图片报错
+	switch items.(type) {
+	case string:
+	default:
+		for _, item := range items.([]interface{}) {
+			// 转为 map 然后读取 Imageurl 然后转为 string
+			img := item.(map[string]interface{})["Imageurl"].(string)
+			if IMAGE_HOST != "" {
+				img = strings.Replace(img, "http://www.anccnet.com", IMAGE_HOST, -1)
+			}
+			images = append(images, img)
 		}
-		images = append(images, img)
 	}
 	return images, err
 }
