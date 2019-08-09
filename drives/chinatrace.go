@@ -16,14 +16,14 @@ import (
 	"github.com/gomsa/tools/uitl"
 )
 
-var (
-	IMAGE_HOST string = ""
-	BASE_HOST  string = "http://webapi.chinatrace.org"
-	KEY        string = "V7N3Xpm4jpRon/WsZ8X/63G8oMeGdUkA8Luxs1CenTY="
-)
-
 // Chinatrace 国家食品(产品)安全追溯平台
 type Chinatrace struct {
+	// "http://xxx.xxx.com"
+	ImageHost string `json:"image_host,omitempty"`
+	// "http://webapi.chinatrace.org"
+	BaseHost string `json:"base_host,omitempty"`
+	// "V7N3Xpm4jpRon/WsZ8X/63G8oMeGdUkA8Luxs1CenTY="
+	Key string `json:"key,omitempty"`
 }
 
 // Get 获取条码商品信息
@@ -56,7 +56,7 @@ func (srv *Chinatrace) getURL(code string) (url string, err error) {
 	if err != nil {
 		return url, err
 	}
-	url = BASE_HOST + url + "&mac=" + mac
+	url = srv.BaseHost + url + "&mac=" + mac
 	return url, err
 }
 
@@ -173,8 +173,8 @@ func (srv *Chinatrace) handerImages(items interface{}) (images []string, err err
 		for _, item := range items.([]interface{}) {
 			// 转为 map 然后读取 Imageurl 然后转为 string
 			img := item.(map[string]interface{})["Imageurl"].(string)
-			if IMAGE_HOST != "" {
-				img = strings.Replace(img, "http://www.anccnet.com", IMAGE_HOST, -1)
+			if srv.ImageHost != "" {
+				img = strings.Replace(img, "http://www.anccnet.com", srv.ImageHost, -1)
 			}
 			images = append(images, img)
 		}
@@ -220,7 +220,7 @@ func (srv *Chinatrace) Headers() (headers map[string]string) {
 
 // getMac 计算 mac
 func (srv *Chinatrace) getMac(url string) (mac string, err error) {
-	key, err := base64.StdEncoding.DecodeString(KEY)
+	key, err := base64.StdEncoding.DecodeString(srv.Key)
 	if err != nil {
 		return mac, err
 	}
