@@ -196,7 +196,7 @@ func (srv *Chinatrace) request(url string, headers map[string]string) (httpConte
 	// http-Client
 	client := &http.Client{}
 	// request
-	request, _ := http.NewRequest("GET", url, strings.NewReader(""))
+	request, _ := http.NewRequest("GET", url, strings.NewReader("name=cjb"))
 
 	for k, v := range headers {
 		request.Header.Set(k, v)
@@ -215,7 +215,14 @@ func (srv *Chinatrace) request(url string, headers map[string]string) (httpConte
 
 // Headers Headers 构建
 func (srv *Chinatrace) Headers() (headers map[string]string) {
-	return map[string]string{"Accept": "application/json", "Content-Type": "application/json;charset=utf-8"}
+	return map[string]string{
+		"Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+		"Accept-Encoding": "gzip, deflate",
+		"Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,und;q=0.6",
+		"Cache-Control":   "max-age=0",
+		"Connection":      "keep-alive",
+		"User-Agent":      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+	}
 }
 
 // getMac 计算 mac
