@@ -152,7 +152,7 @@ func (srv *Chinatrace) handerGoods(content map[string]interface{}) (goods *data.
 	goods.Name = content["ItemName"].(string)
 	goods.Image, _ = srv.handerImages(content["Image"])
 	goods.BrandName = content["BrandName"].(string)
-	goods.Specification = content["ItemSpecification"].(string)
+	goods.Specification = strings.Replace(content["ItemSpecification"].(string), "×", "x", -1)
 	goods.Name = content["ItemName"].(string)
 	goods.Unspsc, _ = strconv.ParseInt(content["ItemClassCode"].(string), 10, 64)
 	goods.UnspscName = content["ItemClassCode"].(string)
