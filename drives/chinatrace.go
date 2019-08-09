@@ -196,7 +196,7 @@ func (srv *Chinatrace) request(url string, headers map[string]string) (httpConte
 	// http-Client
 	client := &http.Client{}
 	// request
-	request, _ := http.NewRequest("GET", url, strings.NewReader("name=cjb"))
+	request, _ := http.NewRequest("GET", url, strings.NewReader(""))
 
 	for k, v := range headers {
 		request.Header.Set(k, v)
@@ -215,13 +215,20 @@ func (srv *Chinatrace) request(url string, headers map[string]string) (httpConte
 
 // Headers Headers 构建
 func (srv *Chinatrace) Headers() (headers map[string]string) {
+	// 	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+	// Accept-Encoding: gzip, deflate
+	// Accept-Language: zh-CN,zh;q=0.9
+	// Cache-Control: max-age=0
+	// Connection: keep-alive
+	// Cookie: ASP.NET_SessionId=qex3rbiyw5ft5diz1ltcql45
+	// Host: v1.gds.org.cn
+	// Referer: http://v1.gds.org.cn/goods.aspx?base_id=F25F56A9F703ED747848039802026E2BEF7B34F6AD959CFADBDABC7FD77685C0872F36D0507DA774
+	// Upgrade-Insecure-Requests: 1
+	// User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
 	return map[string]string{
-		"Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-		"Accept-Encoding": "gzip, deflate",
-		"Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7,und;q=0.6",
-		"Cache-Control":   "max-age=0",
-		"Connection":      "keep-alive",
-		"User-Agent":      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+		"Accept":       "application/json",
+		"Content-Type": "application/json;charset=utf-8",
+		"User-Agent":   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
 	}
 }
 
