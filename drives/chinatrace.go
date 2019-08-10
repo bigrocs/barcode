@@ -72,7 +72,7 @@ func (srv *Chinatrace) getSubGoods(content map[string]interface{}, goods *data.G
 	}
 	// 截取商品信息
 	html := uitl.ConvertToString(string(httpContent), "gbk", "utf8")
-	regex, err := regexp.Compile(`SetValue(.'(.*?)','(.*?)'.);`)
+	regex, err := regexp.Compile(`SetValue\('(.*?)','(.*?)'\)`)
 	atts := regex.FindAllStringSubmatch(html, -1)
 	// 处理商品详情数据
 	srv.handerSubGoods(atts, goods)
@@ -82,31 +82,40 @@ func (srv *Chinatrace) getSubGoods(content map[string]interface{}, goods *data.G
 // handerSubGoods 处理商品详情数据
 func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err error) {
 	for _, varr := range atts {
-		switch varr[2] {
+		switch varr[1] {
+		case `Att_Sys_zh-cn_141_G`:
+			if goods.Name == "无" {
+				goods.Name = varr[2]
+			}
 		case `Att_Sys_en_us_141_G`:
-			goods.EnName = varr[3]
+			goods.EnName = varr[2]
+		case `Att_Sys_en-us_141_G`:
+			goods.EnName = varr[2]
 		case `Att_Sys_zh-cn_101_G`:
-			goods.Width, _ = strconv.ParseInt(varr[3], 10, 64)
+			width, _ := strconv.ParseFloat(varr[2], 64)
+			goods.Width = int64(width)
 		case `Att_Sys_zh-cn_104_G`:
-			switch varr[3] {
+			switch varr[2] {
 			case `厘米`:
 				goods.Width = goods.Width * 10
 			case `米`:
 				goods.Width = goods.Width * 100
 			}
 		case `Att_Sys_zh-cn_106_G`:
-			goods.Height, _ = strconv.ParseInt(varr[3], 10, 64)
+			height, _ := strconv.ParseFloat(varr[2], 64)
+			goods.Height = int64(height)
 		case `Att_Sys_zh-cn_326_G`:
-			switch varr[3] {
+			switch varr[2] {
 			case `厘米`:
 				goods.Height = goods.Height * 10
 			case `米`:
 				goods.Height = goods.Height * 100
 			}
 		case `Att_Sys_zh-cn_118_G`:
-			goods.Depth, _ = strconv.ParseInt(varr[3], 10, 64)
+			depth, _ := strconv.ParseFloat(varr[2], 64)
+			goods.Depth = int64(depth)
 		case `Att_Sys_zh-cn_331_G`:
-			switch varr[3] {
+			switch varr[2] {
 			case `厘米`:
 				goods.Depth = goods.Depth * 10
 			case `米`:
@@ -114,29 +123,31 @@ func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err e
 			}
 
 		case `Att_Sys_zh-cn_10_G`:
-			goods.NetWeight, _ = strconv.ParseInt(varr[3], 10, 64)
+			netWeight, _ := strconv.ParseFloat(varr[2], 64)
+			goods.NetWeight = int64(netWeight)
 		case `Att_Sys_zh-cn_189_G`:
-			switch varr[3] {
+			switch varr[2] {
 			case `千克`:
 				goods.NetWeight = goods.NetWeight * 1000
 			}
 		case `Att_Sys_zh-cn_54_G`:
-			goods.GrossWeight, _ = strconv.ParseInt(varr[3], 10, 64)
+			grossWeight, _ := strconv.ParseFloat(varr[2], 64)
+			goods.GrossWeight = int64(grossWeight)
 		case `Att_Sys_zh-cn_84_G`:
-			switch varr[3] {
+			switch varr[2] {
 			case `千克`:
 				goods.GrossWeight = goods.GrossWeight * 1000
 			}
 		case `Att_Sys_zh-cn_22_G`:
 			regex, _ := regexp.Compile(`.*\((.*?)\)`)
-			atts := regex.FindAllStringSubmatch(varr[3], -1)
+			atts := regex.FindAllStringSubmatch(varr[2], -1)
 			goods.UnspscName = atts[0][1]
 		case `Att_Sys_zh-cn_35_G`:
-			goods.Unit = varr[3]
+			goods.Unit = varr[2]
 		case `Att_Sys_zh-cn_74_G`:
-			goods.Country = varr[3]
+			goods.Country = varr[2]
 		case `Att_Sys_zh-cn_405_G`:
-			goods.Place = varr[3]
+			goods.Place = varr[2]
 		}
 
 	}
@@ -155,7 +166,6 @@ func (srv *Chinatrace) handerGoods(content map[string]interface{}) (goods *data.
 	goods.Specification = strings.Replace(content["ItemSpecification"].(string), "×", "x", -1)
 	goods.Name = content["ItemName"].(string)
 	goods.Unspsc, _ = strconv.ParseInt(content["ItemClassCode"].(string), 10, 64)
-	goods.UnspscName = content["ItemClassCode"].(string)
 	goods.Source = content["codeSource"].(string)
 	goods.FirmName = content["FirmName"].(string)
 	goods.FirmAddress = content["FirmAddress"].(string)
