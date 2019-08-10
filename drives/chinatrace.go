@@ -66,6 +66,9 @@ func (srv *Chinatrace) getSubGoods(content map[string]interface{}, goods *data.G
 	url := content["ItemDescription"].(string)
 	// 请求商品详情页面
 	headers := srv.Headers()
+	// http://v1.gds.org.cn/goods.aspx?base_id=F25F56A9F703ED747848039802026E2BEF7B34F6AD959CFADBDABC7FD77685C0872F36D0507DA774
+	// http://search.anccnet.com/goodsDetail.aspx?base_id=F25F56A9F703ED747848039802026E2BEF7B34F6AD959CFADBDABC7FD77685C0872F36D0507DA774
+	url = strings.Replace(url, "http://v1.gds.org.cn/goods.aspx", "http://search.anccnet.com/goodsDetail.aspx", -1)
 	httpContent, err := srv.request(url, headers)
 	if err != nil {
 		return err
@@ -204,7 +207,18 @@ func (srv *Chinatrace) response(httpContent []byte) (content map[string]interfac
 // request 请求获取数据
 func (srv *Chinatrace) request(url string, headers map[string]string) (httpContentString []byte, err error) {
 	// http-Client
-	client := &http.Client{}
+	client := &http.Client{
+		// CheckRedirect: func() func(req *http.Request, via []*http.Request) error {
+		// 	redirects := 0
+		// 	return func(req *http.Request, via []*http.Request) error {
+		// 		if redirects > 10 {
+		// 			return errors.New("stopped after 10 redirects")
+		// 		}
+		// 		redirects++
+		// 		return nil
+		// 	}
+		// }(),
+	}
 	// request
 	request, _ := http.NewRequest("GET", url, strings.NewReader(""))
 
@@ -235,6 +249,7 @@ func (srv *Chinatrace) Headers() (headers map[string]string) {
 	// Referer: http://v1.gds.org.cn/goods.aspx?base_id=F25F56A9F703ED747848039802026E2BEF7B34F6AD959CFADBDABC7FD77685C0872F36D0507DA774
 	// Upgrade-Insecure-Requests: 1
 	// User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36
+
 	return map[string]string{
 		"Accept":       "application/json",
 		"Content-Type": "application/json;charset=utf-8",
