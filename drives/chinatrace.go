@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -37,6 +38,9 @@ func (srv *Chinatrace) Get(code string) (goods *data.Goods, err error) {
 	content, err := srv.response(httpContent)
 	if err != nil {
 		return goods, err
+	}
+	if content["c"] != "200" {
+		return goods, fmt.Errorf("查询商品失败:%s",content["d"])
 	}
 	goods, err = srv.handerGoods(content)
 	if err != nil {
