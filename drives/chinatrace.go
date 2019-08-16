@@ -164,7 +164,7 @@ func (srv *Chinatrace) handerGoods(content map[string]interface{}) (goods *data.
 
 	goods.Barcode = content["productCode"].(string)
 	goods.Name = content["ItemName"].(string)
-	goods.Image, _ = srv.handerImages(content["Image"])
+	goods.Images, _ = srv.handerImages(content["Image"])
 	goods.BrandName = content["BrandName"].(string)
 	goods.Specification = strings.Replace(content["ItemSpecification"].(string), "×", "x", -1)
 	goods.Name = content["ItemName"].(string)

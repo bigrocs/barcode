@@ -5,7 +5,7 @@ type Goods struct {
 	Barcode       string   // 条码
 	Name          string   // 产品名称
 	EnName        string   // 产品英文名称
-	Image         []string // 产品图片
+	Images         []string // 产品图片
 	BrandName     string   // 品牌
 	Specification string   // 规格
 	Unit          string   // 单位
