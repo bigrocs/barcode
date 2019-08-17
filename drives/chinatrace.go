@@ -148,7 +148,7 @@ func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err e
 		case `Att_Sys_zh-cn_22_G`:
 			regex, _ := regexp.Compile(`.*\((.*?)\)`)
 			atts := regex.FindAllStringSubmatch(varr[2], -1)
-			goods.UnspscName = strings.Replace(atts[0][1], `>>`, `,`, -1)
+			goods.UnspscName = atts[0][1]
 		case `Att_Sys_zh-cn_35_G`:
 			goods.Unit = varr[2]
 		case `Att_Sys_zh-cn_74_G`:
