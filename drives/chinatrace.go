@@ -40,7 +40,7 @@ func (srv *Chinatrace) Get(code string) (goods *data.Goods, err error) {
 		return goods, err
 	}
 	if content["c"] != "200" {
-		return goods, fmt.Errorf("查询商品失败:%s",content["d"])
+		return goods, fmt.Errorf("查询商品失败:%s", content["d"])
 	}
 	goods, err = srv.handerGoods(content)
 	if err != nil {
@@ -148,7 +148,7 @@ func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err e
 		case `Att_Sys_zh-cn_22_G`:
 			regex, _ := regexp.Compile(`.*\((.*?)\)`)
 			atts := regex.FindAllStringSubmatch(varr[2], -1)
-			goods.UnspscName = atts[0][1]
+			goods.UnspscName = strings.Replace(atts[0][1], `>>`, `,`, -1)
 		case `Att_Sys_zh-cn_35_G`:
 			goods.Unit = varr[2]
 		case `Att_Sys_zh-cn_74_G`:
