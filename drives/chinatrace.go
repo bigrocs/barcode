@@ -130,20 +130,20 @@ func (srv *Chinatrace) handerSubGoods(atts [][]string, goods *data.Goods) (err e
 			}
 
 		case `Att_Sys_zh-cn_10_G`:
-			netWeight, _ := strconv.ParseFloat(varr[2], 64)
-			goods.NetWeight = int64(netWeight)
+			netweight, _ := strconv.ParseFloat(varr[2], 64)
+			goods.Netweight = int64(netweight)
 		case `Att_Sys_zh-cn_189_G`:
 			switch varr[2] {
 			case `千克`:
-				goods.NetWeight = goods.NetWeight * 1000
+				goods.Netweight = goods.Netweight * 1000
 			}
 		case `Att_Sys_zh-cn_54_G`:
-			grossWeight, _ := strconv.ParseFloat(varr[2], 64)
-			goods.GrossWeight = int64(grossWeight)
+			grossweight, _ := strconv.ParseFloat(varr[2], 64)
+			goods.Grossweight = int64(grossweight)
 		case `Att_Sys_zh-cn_84_G`:
 			switch varr[2] {
 			case `千克`:
-				goods.GrossWeight = goods.GrossWeight * 1000
+				goods.Grossweight = goods.Grossweight * 1000
 			}
 		case `Att_Sys_zh-cn_22_G`:
 			regex, _ := regexp.Compile(`.*\((.*?)\)`)
